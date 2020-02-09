@@ -31,27 +31,33 @@ func (mm ModuleModel) GetPageModules(pageId int) ([]schema.ModuleSchema, error) 
 	return modules, nil
 }
 
-func (mm ModuleModel) UpdateProjectPage(moduleInfo schema.ModuleSchema) error {
+func (mm ModuleModel) UpdatePageModule(moduleInfo schema.ModuleSchema) error {
+	var targetModuleInfo schema.ModuleSchema
+
 	if moduleInfo.ID == 0 {
 		return mm.databaseHandler.Table(mm.tableName).Create(&moduleInfo).Error
 	}
-	return mm.databaseHandler.Table(mm.tableName).Save(&moduleInfo).Error
+
+	targetModuleInfo.ID = moduleInfo.ID
+	moduleInfo.ID = 0
+
+	return mm.databaseHandler.Table(mm.tableName).Model(&targetModuleInfo).Updates(moduleInfo).Error
 }
 
 func (mm ModuleModel) RemovePageModule(moduleId int) error {
 	return mm.databaseHandler.Table(mm.tableName).Delete(schema.ModuleSchema{}, "id = ?", moduleId).Error
 }
 
-func (mm ModuleModel) SortPageModule(pageId int, sortNoInfo []schema.ModuleSort) error {
+func (mm ModuleModel) SortPageModule(sortNoInfo []schema.ModuleSort) error {
 	var moduleIds []string
 	var sql string = fmt.Sprintf("update %s set sort_no = (case id ", mm.tableName)
 
 	for _, value := range sortNoInfo {
-		moduleIds = append(moduleIds, string(value.Id))
+		moduleIds = append(moduleIds, fmt.Sprintf("%d", value.Id))
 		sql += fmt.Sprintf("when %d then %d ", value.Id, value.SortNo)
 	}
 
-	sql += fmt.Sprintf("end) where id in (%s) and page_id = %d", strings.Join(moduleIds, ","), pageId)
+	sql += fmt.Sprintf("end) where id in (%s)", strings.Join(moduleIds, ","))
 
 	return mm.databaseHandler.Exec(sql).Error
 }

@@ -29,13 +29,21 @@ func (pm PageModel) GetProjectPages(projectId int) ([]schema.PageSchema, error) 
 	return pages, nil
 }
 
-func (pm ProjectModel) UpdateProjectPage(pageInfo schema.PageSchema) error {
+func (pm PageModel) UpdateProjectPage(pageInfo schema.PageSchema) error {
+	var targetPageInfo schema.PageSchema
+
+	// 创建
 	if pageInfo.ID == 0 {
 		return pm.databaseHandler.Table(pm.tableName).Create(&pageInfo).Error
 	}
-	return pm.databaseHandler.Table(pm.tableName).Save(&pageInfo).Error
+
+	// 修改
+	targetPageInfo.ID = pageInfo.ID
+	pageInfo.ID = 0
+
+	return pm.databaseHandler.Table(pm.tableName).Model(&targetPageInfo).Updates(pageInfo).Error
 }
 
-func (pm ProjectModel) RemoveProjectPage(pageId int) error {
+func (pm PageModel) RemoveProjectPage(pageId int) error {
 	return pm.databaseHandler.Table(pm.tableName).Delete(schema.PageSchema{}, "id = ?", pageId).Error
 }

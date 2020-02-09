@@ -11,6 +11,7 @@ type ProjectController struct {
 	BaseController
 }
 
+// 获取项目详情
 func (pc ProjectController) HandleGetProjectDetail(c *gin.Context) {
 	projectId, error := strconv.Atoi(c.Param("projectId"))
 
@@ -28,6 +29,7 @@ func (pc ProjectController) HandleGetProjectDetail(c *gin.Context) {
 	pc.HandleSuccessResponse(c, info)
 }
 
+// 获取项目列表
 type HandleGetProjectsParams struct {
 	Name        string       `form:"name"`
 	State       int          `form:"state"`
@@ -41,6 +43,12 @@ func (pc ProjectController) HandleGetProjects(c *gin.Context) {
 		pc.HandleFailResponse(c, error)
 		return
 	}
+
+	if params.State == 3 {
+		pc.HandleGetRecentProjects(c, params)
+		return
+	}
+
 	projects, total, error := model.NewProjectModel().GetProjects(params.Name, params.State, params.PageNo, params.PageSize)
 
 	if error != nil {
@@ -50,6 +58,18 @@ func (pc ProjectController) HandleGetProjects(c *gin.Context) {
 	pc.HandleSuccessResponse(c, map[string]interface{} { "projects": projects, "total": total })
 }
 
+// 获取最近修改项目
+func (pc ProjectController) HandleGetRecentProjects(c *gin.Context, params HandleGetProjectsParams) {
+	projects, total, error := model.NewProjectModel().GetRecentProjects(params.PageNo, params.PageSize)
+
+	if error != nil {
+		pc.HandleFailResponse(c, error)
+		return
+	}
+	pc.HandleSuccessResponse(c, map[string]interface{} { "projects": projects, "total": total })
+}
+
+// 创建 或者 更新项目
 func (pc ProjectController) HandleUpdateProject(c *gin.Context) {
 	var params schema.ProjectSchema
 
@@ -57,13 +77,15 @@ func (pc ProjectController) HandleUpdateProject(c *gin.Context) {
 		pc.HandleFailResponse(c, error)
 		return
 	}
+
 	if error := model.NewProjectModel().UpdateProject(params); error != nil {
 		pc.HandleFailResponse(c, error)
 		return
 	}
-	pc.HandleSuccessResponse(c, "更新成功")
+	pc.HandleSuccessResponse(c, "操作成功")
 }
 
+// 删除项目
 func (pc ProjectController) HandleRemoveProject(c *gin.Context) {
 	projectId, error := strconv.Atoi(c.Param("projectId"))
 

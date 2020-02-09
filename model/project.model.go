@@ -39,11 +39,31 @@ func (pm ProjectModel) GetProjects(name string, state, pageNo, pageSize int) ([]
 	return projects, total, nil
 }
 
+func (pm ProjectModel) GetRecentProjects(pageNo, pageSize int) ([]schema.ProjectSchema, int, error) {
+	var total int
+	var projects []schema.ProjectSchema
+
+	error := pm.databaseHandler.Table(pm.tableName).Where("state = 1").Order("updated_at desc").Count(&total).Offset(pageNo * pageSize).Limit(pageSize).Find(&projects).Error
+
+	if error != nil {
+		return projects, total, error
+	}
+	return projects, total, nil
+}
+
 func (pm ProjectModel) UpdateProject(project schema.ProjectSchema) error {
+	var targetProject schema.ProjectSchema
+
+	// 创建
 	if project.ID == 0 {
 		return pm.databaseHandler.Table(pm.tableName).Create(&project).Error
 	}
-	return pm.databaseHandler.Table(pm.tableName).Save(&project).Error
+
+	// 修改
+	targetProject.ID = project.ID
+	project.ID = 0
+
+	return pm.databaseHandler.Table(pm.tableName).Model(&targetProject).Updates(project).Error
 }
 
 func (pm ProjectModel) RemoveProject(projectId int) error {

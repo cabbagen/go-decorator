@@ -17,6 +17,8 @@ var routes []description
 func init() {
 	routes = append(routes, projectRoutes...)
 	routes = append(routes, loginRoutes...)
+	routes = append(routes, pageRoutes...)
+	routes = append(routes, moduleRoutes...)
 }
 
 func RegisterRouter(engine *gin.Engine) {
