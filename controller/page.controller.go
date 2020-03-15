@@ -11,7 +11,6 @@ type PageController struct {
 	BaseController
 }
 
-// 获取项目页面
 func (pc PageController) HandleGetProjectPages(c *gin.Context) {
 	projectId, error := strconv.Atoi(c.Param("projectId"))
 
@@ -30,7 +29,6 @@ func (pc PageController) HandleGetProjectPages(c *gin.Context) {
 	pc.HandleSuccessResponse(c, pages)
 }
 
-// 创建 或者 更新 项目页面
 func (pc PageController) HandleUpdateProjectPage(c *gin.Context) {
 	var params schema.PageSchema
 
@@ -46,7 +44,6 @@ func (pc PageController) HandleUpdateProjectPage(c *gin.Context) {
 	pc.HandleSuccessResponse(c, "操作成功")
 }
 
-// 删除项目页面
 func (pc PageController) HandleRemoveProjectPage(c *gin.Context) {
 	pageId, error := strconv.Atoi(c.Param("pageId"))
 

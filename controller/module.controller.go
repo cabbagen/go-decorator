@@ -11,7 +11,6 @@ type ModuleController struct {
 	BaseController
 }
 
-// 获取页面模块
 func (mc ModuleController) HandleGetPageModules(c *gin.Context) {
 	pageId, error := strconv.Atoi(c.Param("pageId"))
 
@@ -30,7 +29,6 @@ func (mc ModuleController) HandleGetPageModules(c *gin.Context) {
 	mc.HandleSuccessResponse(c, modules)
 }
 
-// 创建 或者 更新页面模块
 func (mc ModuleController) HandleUpdatePageModule(c *gin.Context) {
 	var params schema.ModuleSchema
 
@@ -38,7 +36,22 @@ func (mc ModuleController) HandleUpdatePageModule(c *gin.Context) {
 		mc.HandleFailResponse(c, error)
 		return
 	}
+	if params.ID == 0 {
+		mc.handleInnerCreatePageModule(c, params)
+		return
+	}
+	mc.handleInnerUpdatePageModule(c, params)
+}
 
+func (mc ModuleController) handleInnerCreatePageModule(c *gin.Context, params schema.ModuleSchema) {
+	if error := model.NewModuleModel().CreatePageModule(params); error != nil {
+		mc.HandleFailResponse(c, error)
+		return
+	}
+	mc.HandleSuccessResponse(c, "操作成功")
+}
+
+func (mc ModuleController) handleInnerUpdatePageModule(c *gin.Context, params schema.ModuleSchema) {
 	if error := model.NewModuleModel().UpdatePageModule(params); error != nil {
 		mc.HandleFailResponse(c, error)
 		return
@@ -46,7 +59,6 @@ func (mc ModuleController) HandleUpdatePageModule(c *gin.Context) {
 	mc.HandleSuccessResponse(c, "操作成功")
 }
 
-// 删除页面模块
 func (mc ModuleController) HandleRemovePageModule(c *gin.Context) {
 	moduleId, error := strconv.Atoi(c.Param("moduleId"))
 
@@ -62,7 +74,6 @@ func (mc ModuleController) HandleRemovePageModule(c *gin.Context) {
 	mc.HandleSuccessResponse(c, "删除成功")
 }
 
-// 页面模块排序
 type HandleSortPageModulesParams struct {
 	SortInfo          []schema.ModuleSort        `form:"sortInfo"`
 }

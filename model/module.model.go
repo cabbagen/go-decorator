@@ -5,6 +5,7 @@ import (
 	"cts-go/schema"
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"log"
 	"strings"
 )
 
@@ -23,7 +24,7 @@ func NewModuleModel() ModuleModel {
 func (mm ModuleModel) GetPageModules(pageId int) ([]schema.ModuleSchema, error) {
 	var modules []schema.ModuleSchema
 
-	error := mm.databaseHandler.Table(mm.tableName).Where("page_id = ?", pageId).Find(&modules).Error
+	error := mm.databaseHandler.Table(mm.tableName).Where("page_id = ?", pageId).Order("sort_no").Find(&modules).Error
 
 	if error != nil {
 		return modules, error
@@ -31,14 +32,37 @@ func (mm ModuleModel) GetPageModules(pageId int) ([]schema.ModuleSchema, error) 
 	return modules, nil
 }
 
-func (mm ModuleModel) UpdatePageModule(moduleInfo schema.ModuleSchema) error {
-	var targetModuleInfo schema.ModuleSchema
+func (mm ModuleModel) CreatePageModule(moduleInfo schema.ModuleSchema) error {
+	var modules []schema.ModuleSchema
+	var sql string = "page_id = ? and sort_no >= ?"
 
-	if moduleInfo.ID == 0 {
-		return mm.databaseHandler.Table(mm.tableName).Create(&moduleInfo).Error
+	if error := mm.databaseHandler.Table(mm.tableName).Where(sql, moduleInfo.PageId, moduleInfo.SortNo).Find(&modules).Error; error != nil {
+		return error
 	}
 
-	targetModuleInfo.ID = moduleInfo.ID
+	if error := mm.databaseHandler.Table(mm.tableName).Create(&moduleInfo).Error; error != nil {
+		return error
+	}
+
+	if len(modules) == 0 {
+		return nil
+	}
+
+	var sortInfo []schema.ModuleSort
+
+	for _, module := range modules {
+		sortInfo = append(sortInfo, schema.ModuleSort{ Id: module.ID, SortNo: module.SortNo + 1 })
+	}
+
+	return mm.SortPageModule(sortInfo)
+}
+
+func (mm ModuleModel) UpdatePageModule(moduleInfo schema.ModuleSchema) error {
+	var targetModuleInfo schema.ModuleSchema = schema.ModuleSchema {
+		BaseSchema: schema.BaseSchema {
+			ID: moduleInfo.ID,
+		},
+	}
 	moduleInfo.ID = 0
 
 	return mm.databaseHandler.Table(mm.tableName).Model(&targetModuleInfo).Updates(moduleInfo).Error
@@ -59,6 +83,7 @@ func (mm ModuleModel) SortPageModule(sortNoInfo []schema.ModuleSort) error {
 
 	sql += fmt.Sprintf("end) where id in (%s)", strings.Join(moduleIds, ","))
 
+	log.Println(sql)
+
 	return mm.databaseHandler.Exec(sql).Error
 }
-
