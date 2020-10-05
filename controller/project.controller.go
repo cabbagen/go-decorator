@@ -30,34 +30,19 @@ func (pc ProjectController) HandleGetProjectDetail(c *gin.Context) {
 
 type HandleGetProjectsParams struct {
 	Name        string       `form:"name"`
+	Type        int          `form:"type"`
 	State       int          `form:"state"`
 	PageNo      int          `form:"pageNo"`
 	PageSize    int          `form:"pageSize"`
 }
 func (pc ProjectController) HandleGetProjects(c *gin.Context) {
-	var params HandleGetProjectsParams = HandleGetProjectsParams {"", 1,0, 10}
+	var params HandleGetProjectsParams = HandleGetProjectsParams {"", 0, 1,0, 10}
 
 	if error := c.BindQuery(&params); error != nil {
 		pc.HandleFailResponse(c, error)
 		return
 	}
-
-	if params.State == 3 {
-		pc.HandleGetRecentProjects(c, params)
-		return
-	}
-
-	projects, total, error := model.NewProjectModel().GetProjects(params.Name, params.State, params.PageNo, params.PageSize)
-
-	if error != nil {
-		pc.HandleFailResponse(c, error)
-		return
-	}
-	pc.HandleSuccessResponse(c, map[string]interface{} { "projects": projects, "total": total })
-}
-
-func (pc ProjectController) HandleGetRecentProjects(c *gin.Context, params HandleGetProjectsParams) {
-	projects, total, error := model.NewProjectModel().GetRecentProjects(params.PageNo, params.PageSize)
+	projects, total, error := model.NewProjectModel().GetProjects(params.Name, params.Type, params.State, params.PageNo, params.PageSize)
 
 	if error != nil {
 		pc.HandleFailResponse(c, error)

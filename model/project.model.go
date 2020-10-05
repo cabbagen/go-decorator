@@ -27,11 +27,28 @@ func (pm ProjectModel) GetProjectDetail(projectId int) (schema.ProjectSchema, er
 	return detail, nil
 }
 
-func (pm ProjectModel) GetProjects(name string, state, pageNo, pageSize int) ([]schema.ProjectSchema, int, error) {
-	var total int
-	var projects []schema.ProjectSchema
+type ProjectListItemSchema struct {
+	schema.ProjectSchema
+	PageCount      int      `gorm:"column:pageCount; type:int; not null" json:"pageCount"`
+}
 
-	error := pm.databaseHandler.Table(pm.tableName).Where("state = ? and name like ?", state, "%" + name + "%").Count(&total).Offset(pageNo * pageSize).Limit(pageSize).Find(&projects).Error
+func (pm ProjectModel) GetProjects(name string, pType, state, pageNo, pageSize int) ([]ProjectListItemSchema, int, error) {
+	var total int
+	var projects []ProjectListItemSchema
+
+	var whereQueryMap map[string]interface{} = map[string]interface{} {
+		"state": state,
+	}
+
+	if pType != 0 {
+		whereQueryMap["type"] = pType
+	}
+
+	error := pm.databaseHandler.Table(pm.tableName).
+		Select("cms_projects.*, count(cms_pages.id) as pageCount").
+		Joins("left join cms_pages on cms_pages.project_id = cms_projects.id").
+		Where(whereQueryMap).Where("cms_projects.name like ?", "%" + name + "%").
+		Group("cms_projects.id").Count(&total).Offset(pageNo * pageSize).Limit(pageSize).Find(&projects).Error
 
 	if error != nil {
 		return projects, total, error
@@ -39,17 +56,6 @@ func (pm ProjectModel) GetProjects(name string, state, pageNo, pageSize int) ([]
 	return projects, total, nil
 }
 
-func (pm ProjectModel) GetRecentProjects(pageNo, pageSize int) ([]schema.ProjectSchema, int, error) {
-	var total int
-	var projects []schema.ProjectSchema
-
-	error := pm.databaseHandler.Table(pm.tableName).Where("state = 1").Order("updated_at desc").Count(&total).Offset(pageNo * pageSize).Limit(pageSize).Find(&projects).Error
-
-	if error != nil {
-		return projects, total, error
-	}
-	return projects, total, nil
-}
 
 func (pm ProjectModel) UpdateProject(project schema.ProjectSchema) error {
 	var targetProject schema.ProjectSchema
