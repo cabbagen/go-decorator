@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"crypto/md5"
 	"fmt"
+	"crypto/md5"
 )
 
 func StringSliceToInterfaces(list []string) []interface{} {

@@ -1,8 +1,8 @@
 package model
 
 import (
-	"cts-go/database"
 	"cts-go/schema"
+	"cts-go/database"
 	"github.com/jinzhu/gorm"
 )
 

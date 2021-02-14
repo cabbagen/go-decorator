@@ -1,12 +1,11 @@
 package model
 
 import (
-	"cts-go/database"
-	"cts-go/schema"
 	"fmt"
-	"github.com/jinzhu/gorm"
-	"log"
 	"strings"
+	"cts-go/schema"
+	"cts-go/database"
+	"github.com/jinzhu/gorm"
 )
 
 type ModuleModel struct {
@@ -53,7 +52,6 @@ func (mm ModuleModel) CreatePageModule(moduleInfo schema.ModuleSchema) error {
 	for _, module := range modules {
 		sortInfo = append(sortInfo, schema.ModuleSort{ Id: module.ID, SortNo: module.SortNo + 1 })
 	}
-
 	return mm.SortPageModule(sortInfo)
 }
 
@@ -64,7 +62,6 @@ func (mm ModuleModel) UpdatePageModule(moduleInfo schema.ModuleSchema) error {
 		},
 	}
 	moduleInfo.ID = 0
-
 	return mm.databaseHandler.Table(mm.tableName).Model(&targetModuleInfo).Updates(moduleInfo).Error
 }
 
@@ -82,8 +79,6 @@ func (mm ModuleModel) SortPageModule(sortNoInfo []schema.ModuleSort) error {
 	}
 
 	sql += fmt.Sprintf("end) where id in (%s)", strings.Join(moduleIds, ","))
-
-	log.Println(sql)
 
 	return mm.databaseHandler.Exec(sql).Error
 }

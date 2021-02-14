@@ -1,10 +1,10 @@
 package controller
 
 import (
+	"strconv"
 	"cts-go/model"
 	"cts-go/schema"
 	"github.com/gin-gonic/gin"
-	"strconv"
 )
 
 type ModuleController struct {
@@ -25,7 +25,6 @@ func (mc ModuleController) HandleGetPageModules(c *gin.Context) {
 		mc.HandleFailResponse(c, error)
 		return
 	}
-
 	mc.HandleSuccessResponse(c, modules)
 }
 

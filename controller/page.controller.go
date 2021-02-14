@@ -1,10 +1,10 @@
 package controller
 
 import (
+	"strconv"
 	"cts-go/model"
 	"cts-go/schema"
 	"github.com/gin-gonic/gin"
-	"strconv"
 )
 
 type PageController struct {
@@ -25,7 +25,6 @@ func (pc PageController) HandleGetProjectPages(c *gin.Context) {
 		pc.HandleFailResponse(c, error)
 		return
 	}
-
 	pc.HandleSuccessResponse(c, pages)
 }
 
@@ -56,6 +55,5 @@ func (pc PageController) HandleRemoveProjectPage(c *gin.Context) {
 		pc.HandleFailResponse(c, error)
 		return
 	}
-
 	pc.HandleSuccessResponse(c, "删除成功")
 }

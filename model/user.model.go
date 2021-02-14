@@ -1,9 +1,9 @@
 package model
 
 import (
-	"cts-go/database"
-	"cts-go/schema"
 	"cts-go/utils"
+	"cts-go/schema"
+	"cts-go/database"
 	"github.com/jinzhu/gorm"
 )
 
@@ -25,7 +25,6 @@ func (um UserModel) CheckUserInfo(username, password string) (schema.UserSchema,
 	if error := um.databaseHandler.Table(um.tableName).Where("username = ? and password = ?", username, utils.Md5(password)).First(&userInfo).Error; error != nil {
 		return userInfo, error
 	}
-
 	return userInfo, nil
 }
 

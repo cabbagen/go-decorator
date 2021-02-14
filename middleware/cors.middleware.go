@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+	"github.com/gin-gonic/gin"
 )
 
 var defaultCorsOptions map[string]string = map[string]string {
@@ -20,6 +20,5 @@ func HandleCorsMiddleware(c *gin.Context) {
 		c.AbortWithStatus(http.StatusOK)
 		return
 	}
-
 	c.Next()
 }

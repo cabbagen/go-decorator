@@ -1,8 +1,8 @@
 package router
 
 import (
-	"cts-go/config"
 	"fmt"
+	"cts-go/config"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,10 +15,10 @@ type description struct {
 var routes []description
 
 func init() {
-	routes = append(routes, projectRoutes...)
-	routes = append(routes, loginRoutes...)
 	routes = append(routes, pageRoutes...)
+	routes = append(routes, loginRoutes...)
 	routes = append(routes, moduleRoutes...)
+	routes = append(routes, projectRoutes...)
 }
 
 func RegisterRouter(engine *gin.Engine) {

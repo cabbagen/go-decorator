@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
+	"github.com/gin-gonic/gin"
 )
 
 func HandlePanicRecover(c *gin.Context) {
@@ -13,6 +13,5 @@ func HandlePanicRecover(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H { "status": 500, "msg": panicText, "data": nil})
 		}
 	}()
-
 	c.Next()
 }

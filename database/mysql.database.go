@@ -1,11 +1,11 @@
 package database
 
 import (
-	"cts-go/config"
 	"fmt"
+	"log"
+	"cts-go/config"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"log"
 )
 
 var databaseHandler *gorm.DB
