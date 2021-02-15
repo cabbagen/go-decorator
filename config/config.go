@@ -1,7 +1,7 @@
 package config
 
 var ApplicationConfig map[string]string = map[string]string {
-	//"static": "./public",
+	"static": "./public",
 	//"templateDir": "./views",
 }
 

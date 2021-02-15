@@ -28,4 +28,9 @@ var projectRoutes []description = []description {
 		method: "DELETE",
 		handlers: []gin.HandlerFunc{ projectController.HandleRemoveProject },
 	},
+	description {
+		path: "/cms/projects/download/:projectId",
+		method: "GET",
+		handlers: []gin.HandlerFunc { projectController.HandleDownloadProject },
+	},
 }

@@ -12,3 +12,8 @@ type ModuleSort struct {
 	Id                   int           `json:"id"`
 	SortNo               int           `json:"sortNo"`
 }
+
+type PageModule struct {
+	ModuleSchema
+	PageName             string        `gorm:"column:page_name; type:varchar"`
+}
