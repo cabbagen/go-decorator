@@ -11,13 +11,24 @@ var MobileTpl = `
 		<script src="http://localhost:7001/static/library/topic-component.min.js" type="text/javascript"></script>
 	</head>
 	<body>
-		<div id="root"></div>
+		<div id="root">
+			<div id="root">
+				<div v-for="(item, index) in data" :key="index">
+					<component :is="'tc-' + item.type" v-bind="item" />
+				</div>
+			</div>
+		</div>
 	</body>
 	<script type="text/javascript">
 		window._data = {{.Data}}
 	</script>
 	<script type="text/javascript">
-		console.log(window._data);
+		var app = new Vue({
+		    el: '#root',
+		    data: {
+				data: window._data.map(item => Object.assign({}, JSON.parse(item.content), { id: item.id, type: item.type })),
+		    },
+		});
 	</script>
 </html>
 `
