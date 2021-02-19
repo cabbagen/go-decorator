@@ -28,3 +28,26 @@ func (um UserModel) CheckUserInfo(username, password string) (schema.UserSchema,
 	return userInfo, nil
 }
 
+func (um UserModel) GetUserInfo(userId int) (schema.UserSchema, error) {
+	var userInfo schema.UserSchema
+
+	if error := um.databaseHandler.Table(um.tableName).Where("id = ?", userId).First(&userInfo).Error; error != nil {
+		return userInfo, error
+	}
+	return userInfo, nil
+}
+
+func (um UserModel) UpdateUserInfo(userInfo schema.UserSchema) error {
+	var targetProject schema.UserSchema
+
+	// 创建
+	if userInfo.ID == 0 {
+		return um.databaseHandler.Table(um.tableName).Create(&userInfo).Error
+	}
+
+	// 修改
+	targetProject.ID = userInfo.ID
+	userInfo.ID = 0
+
+	return um.databaseHandler.Table(um.tableName).Model(&targetProject).Updates(userInfo).Error
+}
