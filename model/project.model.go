@@ -32,14 +32,17 @@ type ProjectListItemSchema struct {
 	PageCount      int      `gorm:"column:pageCount; type:int; not null" json:"pageCount"`
 }
 
-func (pm ProjectModel) GetProjects(name string, pType, state, pageNo, pageSize int) ([]ProjectListItemSchema, int, error) {
+func (pm ProjectModel) GetProjects(name string, pType, state, IsMark, pageNo, pageSize int) ([]ProjectListItemSchema, int, error) {
 	var total int
 	var projects []ProjectListItemSchema
+	var whereQueryMap map[string]interface{} = make(map[string]interface{})
 
-	var whereQueryMap map[string]interface{} = map[string]interface{} {
-		"state": state,
+	if IsMark != 0 {
+		whereQueryMap["is_mark"] = IsMark
 	}
-
+	if state != 0 {
+		whereQueryMap["state"] = state
+	}
 	if pType != 0 {
 		whereQueryMap["type"] = pType
 	}

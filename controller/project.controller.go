@@ -37,17 +37,18 @@ type HandleGetProjectsParams struct {
 	Name        string       `form:"name"`
 	Type        int          `form:"type"`
 	State       int          `form:"state"`
+	IsMark      int          `form:"isMark"`
 	PageNo      int          `form:"pageNo"`
 	PageSize    int          `form:"pageSize"`
 }
 func (pc ProjectController) HandleGetProjects(c *gin.Context) {
-	var params HandleGetProjectsParams = HandleGetProjectsParams {"", 0, 1,0, 10}
+	var params HandleGetProjectsParams = HandleGetProjectsParams {"", 0, 0,0,0, 10}
 
 	if error := c.BindQuery(&params); error != nil {
 		pc.HandleFailResponse(c, error)
 		return
 	}
-	projects, total, error := model.NewProjectModel().GetProjects(params.Name, params.Type, params.State, params.PageNo, params.PageSize)
+	projects, total, error := model.NewProjectModel().GetProjects(params.Name, params.Type, params.State, params.IsMark, params.PageNo, params.PageSize)
 
 	if error != nil {
 		pc.HandleFailResponse(c, error)
