@@ -8,6 +8,8 @@ import (
 )
 
 func main() {
+	gin.SetMode(gin.ReleaseMode)
+
 	engine := gin.Default()
 
 	// database
