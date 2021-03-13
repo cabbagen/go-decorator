@@ -16,4 +16,5 @@ type ModuleSort struct {
 type PageModule struct {
 	ModuleSchema
 	PageName             string        `gorm:"column:page_name; type:varchar" json:"pageName"`
+	PageLink             string        `gorm:"column:page_link; type:varchar" json:"pageLink"`
 }

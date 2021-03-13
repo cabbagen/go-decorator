@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"os"
 	"fmt"
 	"bytes"
 	"strconv"
+	"io/ioutil"
 	"archive/zip"
 	"cts-go/model"
 	"html/template"
@@ -87,9 +89,10 @@ func (pc ProjectController) HandleRemoveProject(c *gin.Context) {
 	pc.HandleSuccessResponse(c, "删除成功")
 }
 
-type WillDownloadTemplateData struct {
+type TemplateData struct {
 	Data        *[]schema.PageModule
 	Title       string
+	Link        string
 	PageId      int
 }
 func (pc ProjectController) HandleDownloadProject(c *gin.Context) {
@@ -108,7 +111,7 @@ func (pc ProjectController) HandleDownloadProject(c *gin.Context) {
 	}
 
 	c.Writer.Header().Add("Content-Type", "application/octet-stream")
-	c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%s", "源文件.zip"))
+	c.Writer.Header().Add("Content-Disposition", fmt.Sprintf("attachment; filename=%v%s", projectId, ".zip"))
 
 	zipFile, templateDataMap := zip.NewWriter(c.Writer), pc.HandlePageModuleAdaptor(modules)
 
@@ -122,14 +125,15 @@ func (pc ProjectController) HandleDownloadProject(c *gin.Context) {
 	}
 }
 
-func (pc ProjectController) HandlePageModuleAdaptor(modules []schema.PageModule) map[int]WillDownloadTemplateData {
-	var templateDataMap map[int]WillDownloadTemplateData = make(map[int]WillDownloadTemplateData)
+func (pc ProjectController) HandlePageModuleAdaptor(modules []schema.PageModule) map[int]TemplateData {
+	var templateDataMap map[int]TemplateData = make(map[int]TemplateData)
 	for _, value := range modules {
 		if _, has := templateDataMap[value.PageId]; !has {
-			templateDataMap[value.PageId] = WillDownloadTemplateData {
+			templateDataMap[value.PageId] = TemplateData {
 				Data: &[]schema.PageModule { value },
 				Title: value.PageName,
 				PageId: value.PageId,
+				Link: value.PageLink,
 			}
 			continue
 		}
@@ -138,7 +142,7 @@ func (pc ProjectController) HandlePageModuleAdaptor(modules []schema.PageModule)
 	return templateDataMap
 }
 
-func (pc ProjectController) HandleCreatePageModuleZip(zipFile *zip.Writer, templateDataMap map[int]WillDownloadTemplateData) error {
+func (pc ProjectController) HandleCreatePageModuleZip(zipFile *zip.Writer, templateDataMap map[int]TemplateData) error {
 	resourceTemplate, error := template.New("web_page").Parse(resource.MobileTpl)
 
 	if error != nil {
@@ -152,7 +156,7 @@ func (pc ProjectController) HandleCreatePageModuleZip(zipFile *zip.Writer, templ
 			return error
 		}
 
-		file, fileErr := zipFile.Create(fmt.Sprintf("%s.html", value.Title))
+		file, fileErr := zipFile.Create(fmt.Sprintf("%s.html", value.Link))
 
 		if fileErr != nil {
 			return fileErr
@@ -163,4 +167,64 @@ func (pc ProjectController) HandleCreatePageModuleZip(zipFile *zip.Writer, templ
 		}
 	}
 	return nil
+}
+
+func (pc ProjectController) HandleGeneratePreviewFiles(c *gin.Context) {
+	projectId, error := strconv.Atoi(c.Param("projectId"))
+
+	if error != nil {
+		pc.HandleFailResponse(c, error)
+		return
+	}
+
+	modules, error := model.NewModuleModel().GetProjectModules(projectId)
+
+	if error != nil {
+		pc.HandleFailResponse(c, error)
+		return
+	}
+
+	if error := os.Mkdir(fmt.Sprintf("./public/preview/%v", projectId), os.ModePerm); error != nil {
+		pc.HandleFailResponse(c, error)
+		return
+	}
+
+	modulesMap := pc.HandlePageModuleAdaptor(modules)
+
+	resourceTemplate, error := template.New("web_page").Parse(resource.MobileTpl)
+
+	if error != nil {
+		pc.HandleFailResponse(c, error)
+		return
+	}
+
+	for _, value := range modulesMap {
+		fileBuffer := bytes.NewBuffer([]byte{})
+
+		if error := resourceTemplate.Execute(fileBuffer, value); error != nil {
+			pc.HandleFailResponse(c, error)
+			return
+		}
+		if error := ioutil.WriteFile(fmt.Sprintf("./public/preview/%v/%s.html", projectId, value.Link), fileBuffer.Bytes(), os.ModePerm); error != nil {
+			pc.HandleFailResponse(c, error)
+			return
+		}
+	}
+	pc.HandleSuccessResponse(c, "ok")
+}
+
+func (pc ProjectController) HandleRemovePreviewFiles(c *gin.Context) {
+	projectId, error := strconv.Atoi(c.Param("projectId"))
+
+	if error != nil {
+		pc.HandleFailResponse(c, error)
+		return
+	}
+
+	if error := os.RemoveAll(fmt.Sprintf("./public/preview/%v/", projectId)); error != nil {
+		pc.HandleFailResponse(c, error)
+		return
+	}
+
+	pc.HandleSuccessResponse(c, "ok")
 }

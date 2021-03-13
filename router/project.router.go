@@ -33,4 +33,14 @@ var projectRoutes []description = []description {
 		method: "GET",
 		handlers: []gin.HandlerFunc { projectController.HandleDownloadProject },
 	},
+	{
+		path: "/cms/projects/generate/:projectId",
+		method: "GET",
+		handlers: []gin.HandlerFunc { projectController.HandleGeneratePreviewFiles },
+	},
+	{
+		path: "/cms/projects/remove/:projectId",
+		method: "GET",
+		handlers: []gin.HandlerFunc { projectController.HandleRemovePreviewFiles },
+	},
 }

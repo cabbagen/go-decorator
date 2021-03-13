@@ -86,7 +86,7 @@ func (mm ModuleModel) SortPageModule(sortNoInfo []schema.ModuleSort) error {
 func (mm ModuleModel) GetProjectModules(projectId int) ([]schema.PageModule, error) {
 	var modules []schema.PageModule
 	var joinSql string = "inner join cms_pages on cms_pages.id = cms_modules.page_id"
-	var selectSql string = "cms_modules.*, cms_pages.name as page_name"
+	var selectSql string = "cms_modules.*, cms_pages.name as page_name, cms_pages.link as page_link"
 
 	if error := mm.databaseHandler.Table(mm.tableName).Select(selectSql).Joins(joinSql).Where("cms_pages.project_id = ?", projectId).Find(&modules).Error; error != nil {
 		return nil, error

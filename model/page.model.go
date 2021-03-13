@@ -21,7 +21,7 @@ func NewPageModel() PageModel {
 func (pm PageModel) GetProjectPages(projectId int) ([]schema.PageSchema, error) {
 	var pages []schema.PageSchema
 
-	error := pm.databaseHandler.Table(pm.tableName).Where("project_id = ?", projectId).Find(&pages).Error
+	error := pm.databaseHandler.Table(pm.tableName).Where("project_id = ?", projectId).Order("id").Find(&pages).Error
 
 	if error != nil {
 		return pages, error
