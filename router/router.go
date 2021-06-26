@@ -2,7 +2,7 @@ package router
 
 import (
 	"fmt"
-	"cts-go/config"
+	"go-decorator/config"
 	"github.com/gin-gonic/gin"
 )
 

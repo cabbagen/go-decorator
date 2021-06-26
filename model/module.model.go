@@ -3,8 +3,8 @@ package model
 import (
 	"fmt"
 	"strings"
-	"cts-go/schema"
-	"cts-go/database"
+	"go-decorator/schema"
+	"go-decorator/database"
 	"github.com/jinzhu/gorm"
 )
 

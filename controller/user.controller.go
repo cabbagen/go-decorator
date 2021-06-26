@@ -2,8 +2,8 @@ package controller
 
 import (
 	"strconv"
-	"cts-go/model"
-	"cts-go/schema"
+	"go-decorator/model"
+	"go-decorator/schema"
 	"github.com/gin-gonic/gin"
 )
 

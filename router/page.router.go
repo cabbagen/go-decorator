@@ -1,7 +1,7 @@
 package router
 
 import (
-	"cts-go/controller"
+	"go-decorator/controller"
 	"github.com/gin-gonic/gin"
 )
 

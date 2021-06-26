@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"cts-go/model"
 	"encoding/json"
+	"go-decorator/model"
 	"github.com/gin-gonic/gin"
 )
 

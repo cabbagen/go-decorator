@@ -1,4 +1,4 @@
-module cts-go
+module go-decorator
 
 go 1.13
 

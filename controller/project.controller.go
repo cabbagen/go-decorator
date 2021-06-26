@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"io/ioutil"
 	"archive/zip"
-	"cts-go/model"
 	"html/template"
-	"cts-go/schema"
-	"cts-go/resource"
+	"go-decorator/model"
+	"go-decorator/schema"
+	"go-decorator/resource"
 	"github.com/gin-gonic/gin"
 )
 

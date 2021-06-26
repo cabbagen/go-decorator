@@ -1,14 +1,14 @@
 package main
 
 import (
-	"cts-go/database"
-	"cts-go/middleware"
-	"cts-go/router"
+	"go-decorator/router"
+	"go-decorator/database"
+	"go-decorator/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	gin.SetMode(gin.ReleaseMode)
+	//gin.SetMode(gin.ReleaseMode)
 
 	engine := gin.Default()
 
