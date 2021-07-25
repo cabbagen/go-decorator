@@ -29,18 +29,8 @@ var projectRoutes []description = []description {
 		handlers: []gin.HandlerFunc{ projectController.HandleRemoveProject },
 	},
 	description {
-		path: "/cms/projects/download/:projectId",
+		path: "/cms/projects/byTemplates",
 		method: "GET",
-		handlers: []gin.HandlerFunc { projectController.HandleDownloadProject },
-	},
-	{
-		path: "/cms/projects/generate/:projectId",
-		method: "GET",
-		handlers: []gin.HandlerFunc { projectController.HandleGeneratePreviewFiles },
-	},
-	{
-		path: "/cms/projects/remove/:projectId",
-		method: "GET",
-		handlers: []gin.HandlerFunc { projectController.HandleRemovePreviewFiles },
+		handlers: []gin.HandlerFunc { projectController.HandleCreateProjectByTemplate },
 	},
 }

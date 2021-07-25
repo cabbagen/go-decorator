@@ -34,4 +34,3 @@ func GetDatabaseHandleInstance() *gorm.DB {
 	}
 	return databaseHandler
 }
-

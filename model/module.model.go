@@ -33,13 +33,13 @@ func (mm ModuleModel) GetPageModules(pageId int) ([]schema.ModuleSchema, error) 
 
 func (mm ModuleModel) CreatePageModule(moduleInfo schema.ModuleSchema) error {
 	var modules []schema.ModuleSchema
-	var sql string = "page_id = ? and sort_no >= ?"
+	var whereSql string = "page_id = ? and sort_no >= ?"
 
-	if error := mm.databaseHandler.Table(mm.tableName).Where(sql, moduleInfo.PageId, moduleInfo.SortNo).Find(&modules).Error; error != nil {
+	if error := mm.databaseHandler.Table(mm.tableName).Where(whereSql, moduleInfo.PageId, moduleInfo.SortNo).Find(&modules).Error; error != nil {
 		return error
 	}
 
-	if error := mm.databaseHandler.Table(mm.tableName).Create(&moduleInfo).Error; error != nil {
+	if error := mm.databaseHandler.Table(mm.tableName).Create(&moduleInfo).Find(&moduleInfo).Error; error != nil {
 		return error
 	}
 

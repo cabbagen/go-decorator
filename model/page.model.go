@@ -21,7 +21,7 @@ func NewPageModel() PageModel {
 func (pm PageModel) GetProjectPages(projectId int) ([]schema.PageSchema, error) {
 	var pages []schema.PageSchema
 
-	error := pm.databaseHandler.Table(pm.tableName).Where("project_id = ?", projectId).Order("id").Find(&pages).Error
+	error := pm.databaseHandler.Table(pm.tableName).Where("project_id = ?", projectId).Order("cms_pages.id").Find(&pages).Error
 
 	if error != nil {
 		return pages, error
@@ -32,16 +32,16 @@ func (pm PageModel) GetProjectPages(projectId int) ([]schema.PageSchema, error) 
 func (pm PageModel) UpdateProjectPage(pageInfo schema.PageSchema) error {
 	var targetPageInfo schema.PageSchema
 
-	// 创建
-	if pageInfo.ID == 0 {
-		return pm.databaseHandler.Table(pm.tableName).Create(&pageInfo).Error
+	// 修改
+	if pageInfo.ID > 0 {
+		targetPageInfo.ID = pageInfo.ID
+		pageInfo.ID = 0
+
+		return pm.databaseHandler.Table(pm.tableName).Model(&targetPageInfo).Updates(pageInfo).Error
 	}
 
-	// 修改
-	targetPageInfo.ID = pageInfo.ID
-	pageInfo.ID = 0
-
-	return pm.databaseHandler.Table(pm.tableName).Model(&targetPageInfo).Updates(pageInfo).Error
+	// 新增
+	return pm.databaseHandler.Table(pm.tableName).Create(&pageInfo).Find(&pageInfo).Error
 }
 
 func (pm PageModel) RemoveProjectPage(pageId int) error {

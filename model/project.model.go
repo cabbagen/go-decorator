@@ -50,7 +50,9 @@ func (pm ProjectModel) GetProjects(name string, pType, state, IsMark, pageNo, pa
 	error := pm.databaseHandler.Table(pm.tableName).
 		Select("cms_projects.*, count(cms_pages.id) as pageCount").
 		Joins("left join cms_pages on cms_pages.project_id = cms_projects.id").
-		Where(whereQueryMap).Where("cms_projects.name like ?", "%" + name + "%").
+		Where("cms_projects.template_id = ?", 0).
+		Where(whereQueryMap).
+		Where("cms_projects.name like ?", "%" + name + "%").
 		Group("cms_projects.id").Count(&total).Offset(pageNo * pageSize).Limit(pageSize).Find(&projects).Error
 
 	if error != nil {
@@ -58,7 +60,6 @@ func (pm ProjectModel) GetProjects(name string, pType, state, IsMark, pageNo, pa
 	}
 	return projects, total, nil
 }
-
 
 func (pm ProjectModel) UpdateProject(project schema.ProjectSchema) error {
 	var targetProject schema.ProjectSchema

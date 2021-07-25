@@ -28,6 +28,7 @@ func (mc ModuleController) HandleGetPageModules(c *gin.Context) {
 	mc.HandleSuccessResponse(c, modules)
 }
 
+
 func (mc ModuleController) HandleUpdatePageModule(c *gin.Context) {
 	var params schema.ModuleSchema
 
@@ -59,6 +60,7 @@ func (mc ModuleController) handleInnerUpdatePageModule(c *gin.Context, params sc
 }
 
 func (mc ModuleController) HandleRemovePageModule(c *gin.Context) {
+
 	moduleId, error := strconv.Atoi(c.Param("moduleId"))
 
 	if error != nil {

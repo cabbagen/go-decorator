@@ -21,6 +21,7 @@ func init() {
 	routes = append(routes, projectRoutes...)
 	routes = append(routes, userRoutes...)
 	routes = append(routes, commonRoutes...)
+	routes = append(routes, templateRoutes...)
 }
 
 func RegisterRouter(engine *gin.Engine) {
