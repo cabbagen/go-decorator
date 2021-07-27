@@ -37,29 +37,31 @@ type ProjectListItemSchema struct {
 func (pm ProjectModel) GetProjects(name string, pType, state, IsMark, pageNo, pageSize int) ([]ProjectListItemSchema, int, error) {
 	var total int
 	var projects []ProjectListItemSchema
-	var whereQueryMap map[string]interface{} = make(map[string]interface{})
 
-	if IsMark != 0 {
-		whereQueryMap["is_mark"] = IsMark
-	}
-	if state != 0 {
-		whereQueryMap["state"] = state
-	}
-	if pType != 0 {
-		whereQueryMap["type"] = pType
-	}
-
-	error := pm.databaseHandler.Table(pm.tableName).
+	databaseHandler := pm.databaseHandler.Table(pm.tableName).
 		Select("cms_projects.*, count(cms_pages.id) as pageCount").
 		Joins("left join cms_pages on cms_pages.project_id = cms_projects.id").
 		Where("cms_projects.template_id = ?", 0).
-		Where(whereQueryMap).
-		Where("cms_projects.name like ?", "%" + name + "%").
-		Group("cms_projects.id").Count(&total).Offset(pageNo * pageSize).Limit(pageSize).Find(&projects).Error
+		Where("cms_projects.name like ?", "%" + name + "%")
 
-	if error != nil {
+	if IsMark != 0 {
+		databaseHandler = databaseHandler.Where("is_mark = ?", IsMark)
+	}
+
+	if pType != 0 {
+		databaseHandler = databaseHandler.Where("type = ?", pType)
+	}
+
+	if state != 0 {
+		databaseHandler = databaseHandler.Where("state = ?", state)
+	} else {
+		databaseHandler = databaseHandler.Where("state in (?)", []int{1, 2})
+	}
+
+	if error := databaseHandler.Group("cms_projects.id").Count(&total).Offset(pageNo * pageSize).Limit(pageSize).Find(&projects).Error; error != nil {
 		return projects, total, error
 	}
+
 	return projects, total, nil
 }
 
