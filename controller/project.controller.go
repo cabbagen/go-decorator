@@ -1,12 +1,11 @@
 package controller
 
 import (
-	"fmt"
-	"time"
 	"strconv"
 	"go-decorator/model"
 	"go-decorator/schema"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type ProjectController struct {
@@ -92,24 +91,60 @@ func (pc ProjectController) HandleCreateProjectByTemplate(c *gin.Context) {
 		return
 	}
 
-	project, error := model.NewTemplateModel().GetProjectByTemplateId(templateId)
+	project, error := model.NewTemplateModel().CopyProjectByTemplateId(templateId)
 
 	if error != nil {
 		pc.HandleFailResponse(c, error)
 		return
 	}
+	pc.HandleSuccessResponse(c, project)
+}
 
-	project.ID = 0
-	project.Name = fmt.Sprintf("%s的副本", project.Name)
-	project.TemplateId = -1
-	project.CreatedAt = time.Now()
-	project.UpdatedAt = time.Now()
+func (pc ProjectController) HandleProjectPreview(c *gin.Context) {
 
-	if error := model.NewProjectModel().UpdateProject(project); error != nil {
-		pc.HandleFailResponse(c, error)
+	projectId, error := strconv.Atoi(c.Param("projectId"))
+
+	if error != nil {
+		c.HTML(http.StatusOK, "error.tmpl", nil)
 		return
 	}
 
-	pc.HandleSuccessResponse(c, "ok")
-}
+	project, error := model.NewProjectModel().GetProjectDetail(projectId)
 
+	if error != nil || project.State != 1 {
+		c.HTML(http.StatusOK, "error.tmpl", nil)
+		return
+	}
+
+	pages, error := model.NewPageModel().GetProjectPages(projectId)
+
+	if error != nil {
+		c.HTML(http.StatusOK, "error.tmpl", nil)
+		return
+	}
+
+	var current schema.PageSchema
+
+	for _, page := range pages {
+		if c.Param("link") == page.Link[1 : len(page.Link)] {
+			current = page
+		}
+		if c.Param("link") == page.Link[1 : len(page.Link)] + ".html" {
+			current = page
+		}
+	}
+
+	if current.ID == 0 {
+		c.HTML(http.StatusOK, "error.tmpl", nil)
+		return
+	}
+
+	modules, error := model.NewModuleModel().GetPageModules(current.ID)
+
+	if error != nil {
+		c.HTML(http.StatusOK, "error.tmpl", nil)
+		return
+	}
+
+	c.HTML(http.StatusOK, "preview.tmpl", map[string]interface{}{ "Title": current.Name, "Data": modules })
+}

@@ -33,4 +33,9 @@ var projectRoutes []description = []description {
 		method: "GET",
 		handlers: []gin.HandlerFunc { projectController.HandleCreateProjectByTemplate },
 	},
+	{
+		path: "/preview/:projectId/:link",
+		method: "GET",
+		handlers: []gin.HandlerFunc { projectController.HandleProjectPreview },
+	},
 }

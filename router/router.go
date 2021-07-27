@@ -31,7 +31,7 @@ func RegisterRouter(engine *gin.Engine) {
 	}
 	// 模板文件
 	if config.ApplicationConfig["templateDir"] != "" {
-		engine.LoadHTMLGlob(  fmt.Sprintf("%s/**/*", config.ApplicationConfig["templateDir"]))
+		engine.LoadHTMLGlob(fmt.Sprintf("%s/**/*", config.ApplicationConfig["templateDir"]))
 	}
 	// api 接口
 	for _, route := range routes {

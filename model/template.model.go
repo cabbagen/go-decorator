@@ -74,19 +74,11 @@ func (tm TemplateModel) GetTemplateDetail(id int) (schema.TemplateSchema, error)
 	return template, nil
 }
 
-func (tm TemplateModel) GetProjectByTemplateId(id int) (schema.ProjectSchema, error) {
-	var project schema.ProjectSchema
+func (tm TemplateModel) CopyProjectByTemplateId(id int) (schema.ProjectSchema, error) {
+	var template schema.TemplateSchema
 
-	error := tm.databaseHandler.
-		Table(tm.tableName).
-		Select("cms_projects.*").
-		Joins("inner join cms_projects on cms_projects.id = cms_templates.project_id").
-		Where("cms_templates.id = ?", id).
-		First(&project).
-		Error
-
-	if error != nil {
-		return project, error
+	if error := tm.databaseHandler.Table(tm.tableName).Where("id = ?", id).First(&template).Error; error != nil {
+		return schema.ProjectSchema{}, error
 	}
-	return project, nil
+	return NewProjectModel().CopyProject(template.ProjectId)
 }

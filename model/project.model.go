@@ -1,9 +1,11 @@
 package model
 
 import (
+	"fmt"
 	"go-decorator/schema"
 	"go-decorator/database"
 	"github.com/jinzhu/gorm"
+	"time"
 )
 
 type ProjectModel struct {
@@ -78,4 +80,77 @@ func (pm ProjectModel) UpdateProject(project schema.ProjectSchema) error {
 
 func (pm ProjectModel) RemoveProject(projectId int) error {
 	return pm.databaseHandler.Table(pm.tableName).Delete(schema.ProjectSchema{}, "id = ?", projectId).Error
+}
+
+func (pm ProjectModel) CopyProject(id int) (schema.ProjectSchema, error) {
+	var pages []schema.PageSchema
+	var modules []schema.ModuleSchema
+
+	if error := pm.databaseHandler.Table("cms_pages").Where("project_id = ?", id).Find(&pages).Error; error != nil {
+		return schema.ProjectSchema{}, error
+	}
+
+	var pageIds []int
+
+	for _, page := range pages {
+		pageIds = append(pageIds, page.ID)
+	}
+
+	if error := pm.databaseHandler.Table("cms_modules").Where("page_id in (?)", pageIds).Find(&modules).Debug().Error; error != nil {
+		return schema.ProjectSchema{}, error
+	}
+
+	var moduleInfo map[schema.PageSchema][]schema.ModuleSchema = make(map[schema.PageSchema][]schema.ModuleSchema)
+
+	for _, module := range modules {
+		for _, page := range pages {
+			if module.PageId == page.ID {
+				page.ID = 0
+				module.ID = 0
+				moduleInfo[page] = append(moduleInfo[page], module)
+			}
+		}
+	}
+
+	var project schema.ProjectSchema
+
+	if error := pm.databaseHandler.Table("cms_projects").First(&project, "id = ?", id).Error; error != nil {
+		return schema.ProjectSchema{}, error
+	}
+
+	project.ID = 0
+	project.TemplateId = 0
+	project.CreatedAt = time.Now()
+	project.UpdatedAt = time.Now()
+
+	tx := pm.databaseHandler.Begin()
+
+	if error := tx.Table(pm.tableName).Create(&project).First(&project).Error; error != nil {
+		tx.Rollback()
+		return schema.ProjectSchema{}, error
+	}
+
+	var rawSql string = "insert into cms_modules(page_id, type, sort_no, content, remark) values "
+
+	for page, modules := range moduleInfo {
+		page.ProjectId = project.ID
+		page.CreatedAt = time.Now()
+		page.UpdatedAt = time.Now()
+
+		if error := tx.Table("cms_pages").Create(&page).First(&page).Error; error != nil {
+			tx.Rollback()
+			return schema.ProjectSchema{}, error
+		}
+
+		for _, module := range modules {
+			rawSql += fmt.Sprintf("(%d, '%s', %d, '%s', '%s'),", page.ID, module.Type, module.SortNo, module.Content, module.Remark)
+		}
+
+		if error := tx.Exec(fmt.Sprintf("%s;", rawSql[0: len(rawSql) - 1])).Debug().Error; error != nil {
+			tx.Rollback()
+			return schema.ProjectSchema{}, error
+		}
+	}
+
+	return project, tx.Commit().Error
 }

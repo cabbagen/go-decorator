@@ -2,7 +2,7 @@ package config
 
 var ApplicationConfig map[string]string = map[string]string {
 	"static": "./public",
-	//"templateDir": "./views",
+	"templateDir": "./views",
 }
 
 var DatabaseConfig map[string]string = map[string]string {
