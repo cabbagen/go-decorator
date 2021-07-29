@@ -132,12 +132,12 @@ func (pm ProjectModel) CopyProject(id int) (schema.ProjectSchema, error) {
 		return schema.ProjectSchema{}, error
 	}
 
-	var rawSql string = "insert into cms_modules(page_id, type, sort_no, content, remark) values "
-
 	for page, modules := range moduleInfo {
 		page.ProjectId = project.ID
 		page.CreatedAt = time.Now()
 		page.UpdatedAt = time.Now()
+
+		var rawSql string = "insert into cms_modules(page_id, type, sort_no, content, remark) values "
 
 		if error := tx.Table("cms_pages").Create(&page).First(&page).Error; error != nil {
 			tx.Rollback()

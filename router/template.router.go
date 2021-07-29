@@ -24,13 +24,8 @@ var templateRoutes []description = []description{
 		handlers: []gin.HandlerFunc { templateController.HandleGetTemplates },
 	},
 	description {
-		path: "/cms/template/remove",
-		method: "GET",
-		handlers: []gin.HandlerFunc { templateController.HandleRemoveTemplate },
-	},
-	description {
 		path: "/cms/template/:templateId",
 		method: "DELETE",
-		handlers: []gin.HandlerFunc { templateController.HandleGetTemplateDetail },
+		handlers: []gin.HandlerFunc { templateController.HandleRemoveTemplate },
 	},
 }

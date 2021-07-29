@@ -63,7 +63,7 @@ func (tc TemplateController) HandleGetTemplates(c *gin.Context) {
 }
 
 func (tc TemplateController) HandleRemoveTemplate(c *gin.Context) {
-	templateIdString := c.Query("id")
+	templateIdString := c.Param("templateId")
 
 	templateId, error := strconv.Atoi(templateIdString)
 
