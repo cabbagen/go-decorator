@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"go-decorator/provider"
 	"github.com/gin-gonic/gin"
 )
 
@@ -10,11 +11,11 @@ type BaseController struct {
 }
 
 func (bc BaseController) HandleSuccessResponse(c *gin.Context, data interface{}) {
-	c.JSON(http.StatusOK, gin.H { "status": 200, "msg": nil, "data": data })
+	c.JSON(http.StatusOK, provider.NewMSCoreResponse(provider.MSCoreResponseTypeMap["SUCCESS"], data, ""))
 }
 
 func (bc BaseController) HandleFailResponse(c *gin.Context, error error) {
-	c.JSON(http.StatusOK, gin.H { "status": 500, "msg": error.Error(), "data": nil })
+	c.JSON(http.StatusOK, provider.NewMSCoreResponse(provider.MSCoreResponseTypeMap["FAILED"], nil, error.Error()))
 }
 
 func (bc BaseController) HandleFileUpLoad(c *gin.Context) {

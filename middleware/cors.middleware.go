@@ -7,7 +7,7 @@ import (
 
 var defaultCorsOptions map[string]string = map[string]string {
 	"Access-Control-Allow-Origin": "*",
-	"Access-Control-Allow-Headers": "content-type, token, app_key",
+	"Access-Control-Allow-Headers": "content-type, token, app_key, x-requested-with",
 }
 
 func HandleCorsMiddleware(c *gin.Context) {

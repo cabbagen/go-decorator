@@ -1,6 +1,7 @@
 package main
 
 import (
+	"go-decorator/cache"
 	"go-decorator/router"
 	"go-decorator/database"
 	"go-decorator/middleware"
@@ -8,7 +9,7 @@ import (
 )
 
 func main() {
-	gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.DebugMode)
 
 	engine := gin.Default()
 
@@ -16,6 +17,13 @@ func main() {
 	database.Connect()
 
 	defer database.Destroy()
+
+	// cache
+	redis := cache.NewRedisCache()
+
+	redis.Connect()
+
+	defer redis.Destroy()
 
 	// application middleware
 	middleware.RegisterMiddleware(engine)

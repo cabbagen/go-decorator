@@ -5,7 +5,7 @@ import "github.com/gin-gonic/gin"
 var globalMiddleware []gin.HandlerFunc = []gin.HandlerFunc {
 	HandleCorsMiddleware,
 	HandlePanicRecover,
-	HandleAuthMiddleware,
+	HandleTokenMiddleware,
 }
 
 func RegisterMiddleware(app *gin.Engine) {

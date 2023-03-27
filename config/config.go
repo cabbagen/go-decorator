@@ -10,3 +10,9 @@ var DatabaseConfig map[string]string = map[string]string {
 	"username": "root",
 	"password": "artART5201314??",
 }
+
+var CacheConfig map[string]string = map[string]string {
+	"addr": "localhost:6379",
+	"password": "",
+	"db": "0",
+}

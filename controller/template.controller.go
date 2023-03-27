@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"go-decorator/model"
-	"github.com/gin-gonic/gin"
-	"go-decorator/schema"
 	"strconv"
+	"go-decorator/model"
+	"go-decorator/schema"
+	"github.com/gin-gonic/gin"
 )
 
 type TemplateController struct {
@@ -95,5 +95,4 @@ func (tc TemplateController) HandleGetTemplateDetail(c *gin.Context)  {
 	}
 
 	tc.HandleSuccessResponse(c, template)
-	return
 }

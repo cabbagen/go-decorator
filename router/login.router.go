@@ -9,8 +9,13 @@ var loginController controller.LoginController
 
 var loginRoutes []description = []description {
 	description {
-		path: "/handle/login",
+		path: "/cms/login",
 		method: "POST",
 		handlers: []gin.HandlerFunc{ loginController.HandleLogin },
+	},
+	description {
+		path: "/cms/captcha",
+		method: "GET",
+		handlers: []gin.HandlerFunc { loginController.HandleGenerateCaptcha },
 	},
 }
